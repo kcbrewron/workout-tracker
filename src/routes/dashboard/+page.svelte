@@ -104,7 +104,10 @@
                     <div class="text-sm opacity-90">Begin your training</div>
                 </button>
                 
-                <button class="p-4 bg-secondary text-white rounded-lg hover:bg-blue-600 transition-colors">
+                <button 
+                    class="p-4 bg-secondary text-white rounded-lg hover:bg-blue-600 transition-colors"
+                    on:click={() => goto('/workout-planner')}
+                >
                     <div class="text-2xl mb-2">📋</div>
                     <div class="font-medium">Plan Workout</div>
                     <div class="text-sm opacity-90">Create a routine</div>
