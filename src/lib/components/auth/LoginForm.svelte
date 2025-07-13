@@ -1,0 +1,103 @@
+<script>
+    import { auth } from '$lib/stores/auth.js';
+    import { createEventDispatcher } from 'svelte';
+    
+    const dispatch = createEventDispatcher();
+    
+    let email = '';
+    let password = '';
+    let errors = {};
+    let isLoading = false;
+    
+    $: {
+        errors = {};
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            errors.email = 'Please enter a valid email address';
+        }
+        if (password && password.length < 1) {
+            errors.password = 'Password is required';
+        }
+    }
+    
+    const isFormValid = () => {
+        return email && password && Object.keys(errors).length === 0;
+    };
+    
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        if (!isFormValid()) return;
+        
+        isLoading = true;
+        const result = await auth.login(email, password);
+        isLoading = false;
+        
+        if (result.success) {
+            dispatch('success');
+        } else {
+            errors.general = result.error;
+        }
+    };
+</script>
+
+<form on:submit={handleSubmit} class="space-y-6">
+    <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">
+            Email Address
+        </label>
+        <input
+            id="email"
+            type="email"
+            bind:value={email}
+            data-testid="email"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+            class:border-red-500={errors.email}
+            required
+        />
+        {#if errors.email}
+            <p class="mt-1 text-sm text-red-600">{errors.email}</p>
+        {/if}
+    </div>
+
+    <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">
+            Password
+        </label>
+        <input
+            id="password"
+            type="password"
+            bind:value={password}
+            data-testid="password"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+            class:border-red-500={errors.password}
+            required
+        />
+        {#if errors.password}
+            <p class="mt-1 text-sm text-red-600">{errors.password}</p>
+        {/if}
+    </div>
+
+    {#if errors.general}
+        <div class="p-3 bg-red-50 border border-red-200 rounded-md">
+            <p class="text-sm text-red-800">{errors.general}</p>
+        </div>
+    {/if}
+
+    <button
+        type="submit"
+        disabled={!isFormValid() || isLoading}
+        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+        {#if isLoading}
+            <span class="flex items-center">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Signing In...
+            </span>
+        {:else}
+            Sign In
+        {/if}
+    </button>
+</form>
