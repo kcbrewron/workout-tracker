@@ -9,12 +9,14 @@
     let errors = {};
     let isLoading = false;
     
+    // Only validate after user has interacted with fields
     $: {
         errors = {};
-        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        if (email && email.length > 2 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             errors.email = 'Please enter a valid email address';
         }
-        if (password && password.length < 1) {
+        // Don't validate password until they've started typing
+        if (password && password.length > 0 && password.length < 1) {
             errors.password = 'Password is required';
         }
     }

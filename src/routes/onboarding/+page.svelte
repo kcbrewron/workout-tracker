@@ -61,6 +61,30 @@
     const handleComplete = () => {
         goto('/dashboard');
     };
+    
+    const handleSkipDemo = async () => {
+        // Set some demo data and complete onboarding
+        onboarding.setGoals({
+            primaryObjective: 'strength',
+            timeline: '6_months',
+            frequency: '3_4_times',
+            duration: '45_min'
+        });
+        onboarding.setExperience({
+            level: 'intermediate',
+            currentRoutine: 'regular',
+            previousExperience: 'some',
+            injuries: []
+        });
+        onboarding.setPreferences({
+            sports: ['weightlifting', 'running'],
+            equipment: ['full_gym'],
+            focusType: 'recreational',
+            schedule: ['evening']
+        });
+        await onboarding.complete();
+        goto('/dashboard');
+    };
 </script>
 
 <svelte:head>
@@ -79,6 +103,12 @@
                     <h2 class="text-lg font-medium text-gray-900">Setup Your Profile</h2>
                     <div class="flex items-center space-x-4">
                         <span class="text-sm text-gray-500">Step {currentStep + 1} of {steps.length}</span>
+                        <button
+                            on:click={handleSkipDemo}
+                            class="text-sm text-primary hover:text-orange-600"
+                        >
+                            Skip (Demo)
+                        </button>
                         <button
                             on:click={handleLogout}
                             class="text-sm text-gray-500 hover:text-gray-700"

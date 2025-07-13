@@ -79,6 +79,26 @@ function createAuthStore() {
                     }
                 }
             }
+        },
+        
+        setDemoUser: () => {
+            const demoUser = {
+                id: 'demo-user',
+                email: 'demo@workouttracker.com',
+                name: 'Demo User'
+            };
+            
+            set({
+                isAuthenticated: true,
+                user: demoUser,
+                isLoading: false
+            });
+            
+            if (browser) {
+                localStorage.setItem('auth_user', JSON.stringify(demoUser));
+            }
+            
+            return { success: true, user: demoUser };
         }
     };
 }

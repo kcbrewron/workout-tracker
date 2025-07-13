@@ -4,12 +4,29 @@
     
     const dispatch = createEventDispatcher();
     
-    let preferences = {
-        sports: [],
-        equipment: [],
-        focusType: '',
-        schedule: []
+    let selectedSports = [];
+    let selectedEquipment = [];
+    let selectedFocusType = '';
+    let selectedSchedule = [];
+    
+    // Load existing data from store if available
+    onboarding.subscribe((state) => {
+        if (state.preferences.sports.length > 0 || state.preferences.focusType) {
+            selectedSports = [...state.preferences.sports];
+            selectedEquipment = [...state.preferences.equipment];
+            selectedFocusType = state.preferences.focusType;
+            selectedSchedule = [...state.preferences.schedule];
+        }
+    });
+    
+    // Create reactive preferences object
+    $: preferences = { 
+        sports: selectedSports, 
+        equipment: selectedEquipment, 
+        focusType: selectedFocusType, 
+        schedule: selectedSchedule 
     };
+    $: formValid = !!(selectedSports.length > 0 && selectedEquipment.length > 0 && selectedFocusType && selectedSchedule.length > 0);
     
     const sports = [
         { value: 'running', label: 'Running', icon: '🏃' },
@@ -52,34 +69,31 @@
     ];
     
     const toggleSport = (sport) => {
-        if (preferences.sports.includes(sport)) {
-            preferences.sports = preferences.sports.filter(s => s !== sport);
+        if (selectedSports.includes(sport)) {
+            selectedSports = selectedSports.filter(s => s !== sport);
         } else {
-            preferences.sports = [...preferences.sports, sport];
+            selectedSports = [...selectedSports, sport];
         }
     };
     
     const toggleEquipment = (equip) => {
-        if (preferences.equipment.includes(equip)) {
-            preferences.equipment = preferences.equipment.filter(e => e !== equip);
+        if (selectedEquipment.includes(equip)) {
+            selectedEquipment = selectedEquipment.filter(e => e !== equip);
         } else {
-            preferences.equipment = [...preferences.equipment, equip];
+            selectedEquipment = [...selectedEquipment, equip];
         }
     };
     
     const toggleSchedule = (time) => {
-        if (preferences.schedule.includes(time)) {
-            preferences.schedule = preferences.schedule.filter(s => s !== time);
+        if (selectedSchedule.includes(time)) {
+            selectedSchedule = selectedSchedule.filter(s => s !== time);
         } else {
-            preferences.schedule = [...preferences.schedule, time];
+            selectedSchedule = [...selectedSchedule, time];
         }
     };
     
     const isFormValid = () => {
-        return preferences.sports.length > 0 && 
-               preferences.equipment.length > 0 && 
-               preferences.focusType && 
-               preferences.schedule.length > 0;
+        return formValid;
     };
     
     const handleFinish = async () => {
@@ -111,11 +125,11 @@
             <div class="grid grid-cols-3 gap-3">
                 {#each sports as sport}
                     <label class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                           class:border-blue-500={preferences.sports.includes(sport.value)}
-                           class:bg-blue-50={preferences.sports.includes(sport.value)}>
+                           class:border-primary={selectedSports.includes(sport.value)}
+                           class:bg-orange-50={selectedSports.includes(sport.value)}>
                         <input
                             type="checkbox"
-                            checked={preferences.sports.includes(sport.value)}
+                            checked={selectedSports.includes(sport.value)}
                             on:change={() => toggleSport(sport.value)}
                             class="sr-only"
                         />
@@ -132,13 +146,13 @@
             <div class="grid gap-3">
                 {#each equipment as equip}
                     <label class="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                           class:border-blue-500={preferences.equipment.includes(equip.value)}
-                           class:bg-blue-50={preferences.equipment.includes(equip.value)}>
+                           class:border-primary={selectedEquipment.includes(equip.value)}
+                           class:bg-orange-50={selectedEquipment.includes(equip.value)}>
                         <input
                             type="checkbox"
-                            checked={preferences.equipment.includes(equip.value)}
+                            checked={selectedEquipment.includes(equip.value)}
                             on:change={() => toggleEquipment(equip.value)}
-                            class="mt-1 text-blue-600 focus:ring-blue-500"
+                            class="mt-1 text-primary focus:ring-primary"
                         />
                         <div class="ml-3">
                             <div class="font-medium text-gray-900">{equip.label}</div>
@@ -155,13 +169,13 @@
             <div class="grid gap-3">
                 {#each focusTypes as focus}
                     <label class="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                           class:border-blue-500={preferences.focusType === focus.value}
-                           class:bg-blue-50={preferences.focusType === focus.value}>
+                           class:border-primary={selectedFocusType === focus.value}
+                           class:bg-orange-50={selectedFocusType === focus.value}>
                         <input
                             type="radio"
-                            bind:group={preferences.focusType}
+                            bind:group={selectedFocusType}
                             value={focus.value}
-                            class="mt-1 text-blue-600 focus:ring-blue-500"
+                            class="mt-1 text-primary focus:ring-primary"
                         />
                         <div class="ml-3">
                             <div class="font-medium text-gray-900">{focus.label}</div>
@@ -178,13 +192,13 @@
             <div class="grid grid-cols-2 gap-3">
                 {#each scheduleOptions as schedule}
                     <label class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                           class:border-blue-500={preferences.schedule.includes(schedule.value)}
-                           class:bg-blue-50={preferences.schedule.includes(schedule.value)}>
+                           class:border-primary={selectedSchedule.includes(schedule.value)}
+                           class:bg-orange-50={selectedSchedule.includes(schedule.value)}>
                         <input
                             type="checkbox"
-                            checked={preferences.schedule.includes(schedule.value)}
+                            checked={selectedSchedule.includes(schedule.value)}
                             on:change={() => toggleSchedule(schedule.value)}
-                            class="text-blue-600 focus:ring-blue-500"
+                            class="text-primary focus:ring-primary"
                         />
                         <div class="ml-3 flex items-center">
                             <span class="text-lg mr-2">{schedule.icon}</span>
@@ -199,14 +213,14 @@
     <div class="mt-8 flex justify-between">
         <button
             on:click={handleBack}
-            class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="px-6 py-2 bg-accent text-white rounded-md hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-accent"
         >
             Back
         </button>
         <button
             on:click={handleFinish}
-            disabled={!isFormValid()}
-            class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!formValid}
+            class="px-6 py-2 bg-primary text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-gray-300 disabled:text-gray-500 disabled:hover:bg-gray-300 disabled:cursor-not-allowed"
         >
             Complete Setup
         </button>

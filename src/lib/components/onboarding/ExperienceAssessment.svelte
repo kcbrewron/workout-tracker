@@ -4,12 +4,29 @@
     
     const dispatch = createEventDispatcher();
     
-    let experience = {
-        level: '',
-        currentRoutine: '',
-        previousExperience: '',
-        injuries: []
+    let selectedLevel = '';
+    let selectedRoutine = '';
+    let selectedPrevExperience = '';
+    let selectedInjuries = [];
+    
+    // Load existing data from store if available
+    onboarding.subscribe((state) => {
+        if (state.experience.level) {
+            selectedLevel = state.experience.level;
+            selectedRoutine = state.experience.currentRoutine;
+            selectedPrevExperience = state.experience.previousExperience;
+            selectedInjuries = [...state.experience.injuries];
+        }
+    });
+    
+    // Create reactive experience object
+    $: experience = { 
+        level: selectedLevel, 
+        currentRoutine: selectedRoutine, 
+        previousExperience: selectedPrevExperience, 
+        injuries: selectedInjuries 
     };
+    $: formValid = !!(selectedLevel && selectedRoutine && selectedPrevExperience);
     
     const levels = [
         { value: 'beginner', label: 'Beginner', description: 'New to regular exercise or returning after a long break' },
@@ -42,15 +59,15 @@
     ];
     
     const toggleInjury = (injury) => {
-        if (experience.injuries.includes(injury)) {
-            experience.injuries = experience.injuries.filter(i => i !== injury);
+        if (selectedInjuries.includes(injury)) {
+            selectedInjuries = selectedInjuries.filter(i => i !== injury);
         } else {
-            experience.injuries = [...experience.injuries, injury];
+            selectedInjuries = [...selectedInjuries, injury];
         }
     };
     
     const isFormValid = () => {
-        return experience.level && experience.currentRoutine && experience.previousExperience;
+        return formValid;
     };
     
     const handleNext = () => {
@@ -80,13 +97,13 @@
             <div class="grid gap-3">
                 {#each levels as level}
                     <label class="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                           class:border-blue-500={experience.level === level.value}
-                           class:bg-blue-50={experience.level === level.value}>
+                           class:border-primary={selectedLevel === level.value}
+                           class:bg-orange-50={selectedLevel === level.value}>
                         <input
                             type="radio"
-                            bind:group={experience.level}
+                            bind:group={selectedLevel}
                             value={level.value}
-                            class="mt-1 text-blue-600 focus:ring-blue-500"
+                            class="mt-1 text-primary focus:ring-primary"
                         />
                         <div class="ml-3">
                             <div class="font-medium text-gray-900">{level.label}</div>
@@ -103,13 +120,13 @@
             <div class="grid gap-3">
                 {#each routines as routine}
                     <label class="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                           class:border-blue-500={experience.currentRoutine === routine.value}
-                           class:bg-blue-50={experience.currentRoutine === routine.value}>
+                           class:border-primary={selectedRoutine === routine.value}
+                           class:bg-orange-50={selectedRoutine === routine.value}>
                         <input
                             type="radio"
-                            bind:group={experience.currentRoutine}
+                            bind:group={selectedRoutine}
                             value={routine.value}
-                            class="mt-1 text-blue-600 focus:ring-blue-500"
+                            class="mt-1 text-primary focus:ring-primary"
                         />
                         <div class="ml-3">
                             <div class="font-medium text-gray-900">{routine.label}</div>
@@ -126,13 +143,13 @@
             <div class="grid gap-3">
                 {#each experienceOptions as exp}
                     <label class="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                           class:border-blue-500={experience.previousExperience === exp.value}
-                           class:bg-blue-50={experience.previousExperience === exp.value}>
+                           class:border-primary={selectedPrevExperience === exp.value}
+                           class:bg-orange-50={selectedPrevExperience === exp.value}>
                         <input
                             type="radio"
-                            bind:group={experience.previousExperience}
+                            bind:group={selectedPrevExperience}
                             value={exp.value}
-                            class="mt-1 text-blue-600 focus:ring-blue-500"
+                            class="mt-1 text-primary focus:ring-primary"
                         />
                         <div class="ml-3">
                             <div class="font-medium text-gray-900">{exp.label}</div>
@@ -150,13 +167,13 @@
             <div class="grid grid-cols-2 gap-3">
                 {#each commonInjuries as injury}
                     <label class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                           class:border-blue-500={experience.injuries.includes(injury)}
-                           class:bg-blue-50={experience.injuries.includes(injury)}>
+                           class:border-primary={selectedInjuries.includes(injury)}
+                           class:bg-orange-50={selectedInjuries.includes(injury)}>
                         <input
                             type="checkbox"
-                            checked={experience.injuries.includes(injury)}
+                            checked={selectedInjuries.includes(injury)}
                             on:change={() => toggleInjury(injury)}
-                            class="text-blue-600 focus:ring-blue-500"
+                            class="text-primary focus:ring-primary"
                         />
                         <span class="ml-3 text-sm font-medium text-gray-900">{injury}</span>
                     </label>
@@ -168,14 +185,14 @@
     <div class="mt-8 flex justify-between">
         <button
             on:click={handleBack}
-            class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="px-6 py-2 bg-accent text-white rounded-md hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-accent"
         >
             Back
         </button>
         <button
             on:click={handleNext}
-            disabled={!isFormValid()}
-            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!formValid}
+            class="px-6 py-2 bg-primary text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-gray-300 disabled:text-gray-500 disabled:hover:bg-gray-300 disabled:cursor-not-allowed"
         >
             Continue
         </button>

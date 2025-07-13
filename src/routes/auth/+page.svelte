@@ -28,6 +28,12 @@
     const switchMode = () => {
         isLogin = !isLogin;
     };
+    
+    const handleDemoMode = () => {
+        // Simulate successful login for demo purposes
+        auth.setDemoUser();
+        goto('/onboarding');
+    };
 </script>
 
 <svelte:head>
@@ -69,12 +75,19 @@
                     </div>
                 </div>
 
-                <div class="mt-6">
+                <div class="mt-6 space-y-3">
                     <button
                         on:click={switchMode}
                         class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-orange-500 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
                     >
                         {isLogin ? 'Create new account' : 'Sign in instead'}
+                    </button>
+                    
+                    <button
+                        on:click={handleDemoMode}
+                        class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                    >
+                        🚀 Try Demo Mode (No Registration)
                     </button>
                 </div>
             </div>

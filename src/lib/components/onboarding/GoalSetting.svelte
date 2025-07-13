@@ -4,12 +4,29 @@
     
     const dispatch = createEventDispatcher();
     
-    let goals = {
-        primaryObjective: '',
-        timeline: '',
-        frequency: '',
-        duration: ''
+    let selectedObjective = '';
+    let selectedTimeline = '';
+    let selectedFrequency = '';
+    let selectedDuration = '';
+    
+    // Load existing data from store if available
+    onboarding.subscribe((state) => {
+        if (state.goals.primaryObjective) {
+            selectedObjective = state.goals.primaryObjective;
+            selectedTimeline = state.goals.timeline;
+            selectedFrequency = state.goals.frequency;
+            selectedDuration = state.goals.duration;
+        }
+    });
+    
+    // Create reactive goals object
+    $: goals = { 
+        primaryObjective: selectedObjective, 
+        timeline: selectedTimeline, 
+        frequency: selectedFrequency, 
+        duration: selectedDuration 
     };
+    $: formValid = !!(selectedObjective && selectedTimeline && selectedFrequency && selectedDuration);
     
     const objectives = [
         { value: 'strength', label: 'Build Strength', description: 'Focus on increasing muscle strength and power' },
@@ -41,7 +58,7 @@
     ];
     
     const isFormValid = () => {
-        return goals.primaryObjective && goals.timeline && goals.frequency && goals.duration;
+        return formValid;
     };
     
     const handleNext = () => {
@@ -66,13 +83,13 @@
             <div class="grid gap-3">
                 {#each objectives as objective}
                     <label class="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                           class:border-brand-orange={goals.primaryObjective === objective.value}
-                           class:bg-orange-50={goals.primaryObjective === objective.value}>
+                           class:border-primary={selectedObjective === objective.value}
+                           class:bg-orange-50={selectedObjective === objective.value}>
                         <input
                             type="radio"
-                            bind:group={goals.primaryObjective}
+                            bind:group={selectedObjective}
                             value={objective.value}
-                            class="mt-1 text-brand-orange focus:ring-brand-orange"
+                            class="mt-1 text-primary focus:ring-primary"
                         />
                         <div class="ml-3">
                             <div class="font-medium text-gray-900">{objective.label}</div>
@@ -89,13 +106,13 @@
             <div class="grid grid-cols-2 gap-3">
                 {#each timelines as timeline}
                     <label class="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                           class:border-brand-orange={goals.timeline === timeline.value}
-                           class:bg-orange-50={goals.timeline === timeline.value}>
+                           class:border-primary={selectedTimeline === timeline.value}
+                           class:bg-orange-50={selectedTimeline === timeline.value}>
                         <input
                             type="radio"
-                            bind:group={goals.timeline}
+                            bind:group={selectedTimeline}
                             value={timeline.value}
-                            class="mt-1 text-brand-orange focus:ring-brand-orange"
+                            class="mt-1 text-primary focus:ring-primary"
                         />
                         <div class="ml-3">
                             <div class="font-medium text-gray-900">{timeline.label}</div>
@@ -112,13 +129,13 @@
             <div class="grid gap-3">
                 {#each frequencies as frequency}
                     <label class="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                           class:border-brand-orange={goals.frequency === frequency.value}
-                           class:bg-orange-50={goals.frequency === frequency.value}>
+                           class:border-primary={selectedFrequency === frequency.value}
+                           class:bg-orange-50={selectedFrequency === frequency.value}>
                         <input
                             type="radio"
-                            bind:group={goals.frequency}
+                            bind:group={selectedFrequency}
                             value={frequency.value}
-                            class="mt-1 text-brand-orange focus:ring-brand-orange"
+                            class="mt-1 text-primary focus:ring-primary"
                         />
                         <div class="ml-3">
                             <div class="font-medium text-gray-900">{frequency.label}</div>
@@ -135,13 +152,13 @@
             <div class="grid grid-cols-2 gap-3">
                 {#each durations as duration}
                     <label class="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                           class:border-brand-orange={goals.duration === duration.value}
-                           class:bg-orange-50={goals.duration === duration.value}>
+                           class:border-primary={selectedDuration === duration.value}
+                           class:bg-orange-50={selectedDuration === duration.value}>
                         <input
                             type="radio"
-                            bind:group={goals.duration}
+                            bind:group={selectedDuration}
                             value={duration.value}
-                            class="mt-1 text-brand-orange focus:ring-brand-orange"
+                            class="mt-1 text-primary focus:ring-primary"
                         />
                         <div class="ml-3">
                             <div class="font-medium text-gray-900">{duration.label}</div>
@@ -156,8 +173,8 @@
     <div class="mt-8 flex justify-end">
         <button
             on:click={handleNext}
-            disabled={!isFormValid()}
-            class="px-6 py-2 bg-brand-orange text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-brand-orange disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!formValid}
+            class="px-6 py-2 bg-primary text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-gray-300 disabled:text-gray-500 disabled:hover:bg-gray-300 disabled:cursor-not-allowed"
         >
             Continue
         </button>

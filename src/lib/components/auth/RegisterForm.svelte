@@ -11,18 +11,19 @@
     let errors = {};
     let isLoading = false;
     
+    // Only validate after user has interacted with fields
     $: {
         errors = {};
-        if (name && name.length < 2) {
+        if (name && name.length > 0 && name.length < 2) {
             errors.name = 'Name must be at least 2 characters';
         }
-        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        if (email && email.length > 2 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             errors.email = 'Please enter a valid email address';
         }
-        if (password && password.length < 6) {
+        if (password && password.length > 0 && password.length < 6) {
             errors.password = 'Password must be at least 6 characters';
         }
-        if (confirmPassword && password !== confirmPassword) {
+        if (confirmPassword && confirmPassword.length > 0 && password !== confirmPassword) {
             errors.confirmPassword = 'Passwords do not match';
         }
     }
@@ -59,7 +60,7 @@
             type="text"
             bind:value={name}
             data-testid="name"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-orange focus:border-brand-orange"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
             class:border-red-500={errors.name}
             required
         />
@@ -77,7 +78,7 @@
             type="email"
             bind:value={email}
             data-testid="email"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-orange focus:border-brand-orange"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
             class:border-red-500={errors.email}
             required
         />
@@ -95,7 +96,7 @@
             type="password"
             bind:value={password}
             data-testid="password"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-orange focus:border-brand-orange"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
             class:border-red-500={errors.password}
             required
         />
@@ -113,7 +114,7 @@
             type="password"
             bind:value={confirmPassword}
             data-testid="confirmPassword"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-orange focus:border-brand-orange"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
             class:border-red-500={errors.confirmPassword}
             required
         />
@@ -131,7 +132,7 @@
     <button
         type="submit"
         disabled={!isFormValid() || isLoading}
-        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-orange hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-orange disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
     >
         {#if isLoading}
             <span class="flex items-center">
