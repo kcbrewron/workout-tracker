@@ -46,13 +46,13 @@
                     <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex">
                         <button
                             on:click={handleGetStarted}
-                            class="flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-orange-600 md:py-4 md:text-lg md:px-10 transition-colors"
+                            class="w-full px-4 flex items-center justify-center py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-orange-600 md:py-4 md:text-lg md:px-10 transition-colors sm:w-auto"
                         >
                             Get Started Free
                         </button>
                         <a
                             href="#features"
-                            class="flex items-center justify-center px-8 py-3 border border-white text-base font-medium rounded-md text-white bg-transparent hover:bg-white hover:text-gray-900 md:py-4 md:text-lg md:px-10 transition-colors"
+                            class="w-full px-4 flex items-center justify-center py-3 border border-white text-base font-medium rounded-md text-white bg-transparent hover:bg-white hover:text-gray-900 md:py-4 md:text-lg md:px-10 transition-colors sm:w-auto"
                         >
                             Learn More
                         </a>
@@ -110,7 +110,7 @@
             </p>
             <button
                 on:click={handleGetStarted}
-                class="mt-8 px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-orange-600 md:py-4 md:text-lg md:px-10 transition-colors"
+                class="w-full px-4 mt-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-orange-600 md:py-4 md:text-lg md:px-10 transition-colors sm:w-auto"
             >
                 Get Started Today
             </button>

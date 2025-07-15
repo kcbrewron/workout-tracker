@@ -134,6 +134,20 @@ function createWorkoutStore() {
 
         clearGeneratedRoutine: () => {
             update(state => ({ ...state, generatedRoutine: null }));
+        },
+
+        deleteRoutine: (routineId) => {
+            update(state => ({
+                ...state,
+                savedRoutines: state.savedRoutines.filter(routine => routine.id !== routineId)
+            }));
+
+            // Also remove from localStorage
+            if (browser) {
+                const saved = JSON.parse(localStorage.getItem('saved_routines') || '[]');
+                const filtered = saved.filter(routine => routine.id !== routineId);
+                localStorage.setItem('saved_routines', JSON.stringify(filtered));
+            }
         }
     };
 }

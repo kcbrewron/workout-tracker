@@ -3,13 +3,17 @@
     import { auth } from '$lib/stores/auth.js';
     import { onboarding } from '$lib/stores/onboarding.js';
     import { workout } from '$lib/stores/workout.js';
+    import { alertStore } from '$lib/stores/alerts.js';
     import { goto } from '$app/navigation';
     import Header from '$lib/components/Header.svelte';
     import WorkoutGenerator from '$lib/components/workout/WorkoutGenerator.svelte';
+    import ConfirmModal from '$lib/components/ConfirmModal.svelte';
 
     let user = null;
     let onboardingData = null;
     let workoutStore = null;
+    let showDeleteConfirm = false;
+    let routineToDelete = null;
     let activeTab = 'generate';
 
     onMount(() => {
@@ -50,15 +54,26 @@
 
     function startWorkout(routine) {
         workout.setCurrentRoutine(routine);
-        // Navigate to workout session page when implemented
-        alert(`Starting workout: ${routine.name}`);
+        goto('/workout-session');
     }
 
     function deleteRoutine(routineId) {
-        if (confirm('Are you sure you want to delete this routine?')) {
-            // Implement delete functionality
-            console.log('Delete routine:', routineId);
+        routineToDelete = routineId;
+        showDeleteConfirm = true;
+    }
+    
+    function confirmDelete() {
+        if (routineToDelete) {
+            workout.deleteRoutine(routineToDelete);
+            alertStore.success('Routine deleted successfully');
+            routineToDelete = null;
         }
+        showDeleteConfirm = false;
+    }
+    
+    function cancelDelete() {
+        routineToDelete = null;
+        showDeleteConfirm = false;
     }
 
     function formatDate(dateString) {
@@ -174,3 +189,15 @@
         {/if}
     </main>
 </div>
+
+<!-- Confirmation Modal -->
+<ConfirmModal 
+    bind:show={showDeleteConfirm}
+    title="Delete Routine"
+    message="Are you sure you want to delete this routine? This action cannot be undone."
+    confirmText="Delete"
+    cancelText="Cancel"
+    confirmType="danger"
+    on:confirm={confirmDelete}
+    on:cancel={cancelDelete}
+/>

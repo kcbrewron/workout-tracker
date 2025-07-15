@@ -16,8 +16,8 @@
             errors.email = 'Please enter a valid email address';
         }
         // Don't validate password until they've started typing
-        if (password && password.length > 0 && password.length < 1) {
-            errors.password = 'Password is required';
+        if (password && password.length > 0 && password.length < 6) {
+            errors.password = 'Password must be at least 6 characters';
         }
     }
     

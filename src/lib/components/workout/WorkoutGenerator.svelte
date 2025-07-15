@@ -2,12 +2,16 @@
     import { onMount } from 'svelte';
     import { workout } from '$lib/stores/workout.js';
     import { onboarding } from '$lib/stores/onboarding.js';
+    import { alertStore } from '$lib/stores/alerts.js';
+    import { validateWorkoutName } from '$lib/utils/profanityFilter.js';
 
     export let onRoutineGenerated = () => {};
 
     let onboardingData = null;
     let isGenerating = false;
     let generatedRoutine = null;
+    let workoutName = '';
+    let nameError = '';
     let preferences = {
         type: 'mixed',
         duration: '30_45_mins',
@@ -66,10 +70,26 @@
         }
     }
 
+    function validateName() {
+        const validation = validateWorkoutName(workoutName);
+        nameError = validation.error || '';
+        return validation.isValid;
+    }
+
     function saveRoutine() {
         if (generatedRoutine) {
-            const saved = workout.saveRoutine(generatedRoutine);
-            alert(`Routine "${saved.name}" saved successfully!`);
+            if (!validateName()) {
+                return;
+            }
+
+            const routineWithCustomName = {
+                ...generatedRoutine,
+                name: workoutName.trim() || generatedRoutine.name
+            };
+            
+            const saved = workout.saveRoutine(routineWithCustomName);
+            alertStore.success(`Routine "${saved.name}" saved successfully!`);
+            workoutName = ''; // Reset the name field
         }
     }
 
@@ -184,22 +204,49 @@
             </div>
             
             <div class="border-t pt-6">
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-900">{generatedRoutine.name}</h3>
-                        <p class="text-gray-600 mt-1">{generatedRoutine.description}</p>
-                        <div class="flex gap-4 mt-2 text-sm text-gray-500">
-                            <span>⏱️ {generatedRoutine.estimatedTime} minutes</span>
-                            <span>📈 {generatedRoutine.difficulty}</span>
-                            <span>🏃 {generatedRoutine.type}</span>
+                <div class="mb-4">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">{generatedRoutine.name}</h3>
+                            <p class="text-gray-600 mt-1">{generatedRoutine.description}</p>
+                            <div class="flex gap-4 mt-2 text-sm text-gray-500">
+                                <span>⏱️ {generatedRoutine.estimatedTime} minutes</span>
+                                <span>📈 {generatedRoutine.difficulty}</span>
+                                <span>🏃 {generatedRoutine.type}</span>
+                            </div>
                         </div>
                     </div>
-                    <button
-                        class="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-blue-600 transition-colors"
-                        on:click={saveRoutine}
-                    >
-                        💾 Save Routine
-                    </button>
+                    
+                    <!-- Custom Name Input -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Custom Workout Name (Optional)
+                        </label>
+                        <input
+                            type="text"
+                            bind:value={workoutName}
+                            on:input={validateName}
+                            placeholder={generatedRoutine.name}
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                            maxlength="50"
+                        />
+                        {#if nameError}
+                            <p class="mt-1 text-sm text-red-600">{nameError}</p>
+                        {/if}
+                        <p class="mt-1 text-xs text-gray-500">
+                            Give your workout a memorable name to distinguish it from others
+                        </p>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button
+                            class="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            on:click={saveRoutine}
+                            disabled={nameError}
+                        >
+                            💾 Save Routine
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Group exercises by phase -->
